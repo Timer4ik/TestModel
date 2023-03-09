@@ -1,15 +1,31 @@
-export class BaseModel {
+import * as Api from "../api/api"
+
+// 
+// interface Api {
+//     get(url,options) => response
+//     getOne(url,id,options)
+//     post(url,body,options) => response
+//     put(url,id,body,options) => response
+//     delete(url,id,options) => response
+// }
+
+class AbstractModel {
     static url = ""
 
-    // Было бы хорошо сделать baseRequest в виде dependency injection, чтобы модель не зависила от реализации api
+    static prepareDataToUse(response) {
+        return response.data
+    }
 
-    static async findOne(id, options = {}) {
-        // options.method по хорошему должна быть методом из интерфейса api
-        options.method = "GET"
+    static prepareBodyToSend(data) {
+        return data
+    }
 
-        const response = await baseRequest(`${this.url}/${id}`, options)
+    static async findOne(id = null, options = {}) {
+        const response = await Api.getOne(this.url, id, options)
 
-        const data = new this(response.data)
+        const handledResponseData = this.prepareDataToUse(response)
+
+        const data = new this(handledResponseData)
 
         return data
     }
@@ -17,44 +33,49 @@ export class BaseModel {
     static async findAll(options = {}) {
         options.method = "GET"
 
-        const response = await baseRequest(this.url, options)
+        const response = await Api.get(this.url, options)
 
-        const data = response.data.map(item => new this(item))
+        const handledResponseData = this.prepareDataToUse(response)
 
-        return data
-    }
-
-    static async updateOne(id = 0, options = {}) {
-        options.method = "PUT"
-
-        const response = await baseRequest(`${this.url}/${id}`, options)
-
-        const data = new this(response.data)
+        const data = handledResponseData.map(item => new this(item))
+       
+        data.meta = response.meta
 
         return data
     }
 
+    static async updateOne(id = null, body = {}, options = {}) {
+        const response = await Api.put(this.url, id, this.prepareBodyToSend(body), options)
+        const handledResponseData = this.prepareDataToUse(response)
+
+        const data = new this(handledResponseData)
+
+        return data
+    }
 
     static async create(body = {}, options = {}) {
-        options.method = "POST"
-        options.body = body
-        return await baseRequest(this.url, options)
+        const response = await Api.post(this.url, this.prepareBodyToSend(body), options)
+
+        const handledResponseData = this.prepareDataToUse(response)
+
+        const data = new this(handledResponseData)
+
+        return data
     }
 }
 
-export class Model extends BaseModel {
+export class BaseModel extends AbstractModel {
 
     toJSON() {
         return { ...this }
     }
 
-    // Тестовая генерация полей
-    // generateFields(data) {
-    //     Object.entries(data).forEach(entry => {
-    //         const [key, value] = entry
-    //         this[key] = value
-    //     })
-    // }
+    generateFields(data) {
+        Object.entries(data).forEach(entry => {
+            const [key, value] = entry
+            this[key] = value
+        })
+    }
 
     constructor() {
         super()
@@ -62,7 +83,8 @@ export class Model extends BaseModel {
 
     async save(options = {}) {
         options.method = "POST"
-        options.body = { ...this }
+        
+        options.body =  { ...this.constructor.prepareBodyToSend(this) }
 
         return await baseRequest(this.constructor.url, options)
     }
