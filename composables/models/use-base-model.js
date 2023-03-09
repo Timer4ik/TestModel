@@ -31,8 +31,6 @@ class AbstractModel {
     }
 
     static async findAll(options = {}) {
-        options.method = "GET"
-
         const response = await Api.get(this.url, options)
 
         const handledResponseData = this.prepareDataToUse(response)
