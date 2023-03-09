@@ -8,6 +8,7 @@ import * as Api from "../api/api"
 //     put(url,id,body,options) => response
 //     delete(url,id,options) => response
 // }
+// response по умолчанию подразумевает response => {data,meta} , но с помощью prepareDataToUse можно поменять data на то, что прилетает с бэка
 
 class AbstractModel {
     static url = ""
@@ -16,8 +17,8 @@ class AbstractModel {
         return response.data
     }
 
-    static prepareBodyToSend(data) {
-        return data
+    static prepareBodyToSend(body) {
+        return body
     }
 
     static async findOne(id = null, options = {}) {

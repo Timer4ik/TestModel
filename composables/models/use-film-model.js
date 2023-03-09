@@ -11,20 +11,20 @@ export class FilmModel extends BaseModel {
     }
 
     // Подготавливает данные к отправке (необязательный метод, если данные при отправке такие же, что и при получении)
-    static prepareBodyToSend(data) {
+    static prepareBodyToSend(body) {
         return {
-            rent_film_id: data.RentFilmId,
-            createdAt: data.CreatedAt,
-            descr: data.Descr,
-            image_url: data.ImageUrl,
-            name: data.Name,
-            price: data.Price,
-            rent_end_dt: data.RentEndDt,
-            rent_start_dt: data.RentStartDt,
-            session_times: data.SessionTimes,
-            status: data.Status,
-            updatedAt: data.UpdatedAt,
-            year: data.Year,
+            rent_film_id: body.RentFilmId,
+            createdAt: body.CreatedAt,
+            descr: body.Descr,
+            image_url: body.ImageUrl,
+            name: body.Name,
+            price: body.Price,
+            rent_end_dt: body.RentEndDt,
+            rent_start_dt: body.RentStartDt,
+            session_times: body.SessionTimes,
+            status: body.Status,
+            updatedAt: body.UpdatedAt,
+            year: body.Year,
         }
     }
 
