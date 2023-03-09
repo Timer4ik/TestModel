@@ -5,12 +5,12 @@ export class FilmModel extends BaseModel {
 
     static url = "/api/film"
 
-    // Выцепляем данные данные из ответа
+    // Выцепляем данные данные из ответа (необязательный метод, если данные при отправке такие же, что и при получении)
     static prepareDataToUse(response) {
         return response.data
     }
 
-    // Подготавливает данные к отправке 
+    // Подготавливает данные к отправке (необязательный метод, если данные при отправке такие же, что и при получении)
     static prepareBodyToSend(data) {
         return {
             rent_film_id: data.RentFilmId,
@@ -30,6 +30,7 @@ export class FilmModel extends BaseModel {
 
     constructor(data) {
         super()
+        // (необязательное условие, если данные при отправке такие же, что и при получении)
         if (data instanceof FilmModel) {
             this.generateFields(data)
         }
